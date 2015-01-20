@@ -131,7 +131,8 @@ modFit &lt;- train(classe ~ ., method=&quot;gbm&quot;,data=training,verbose=FALS
 ## Loading required package: parallel
 ## Loaded gbm 2.1
 ## Loading required package: plyr</code></pre>
-<pre class="r"><code>confusionMatrix(trainpred,training$classe)</code></pre>
+<pre class="r"><code>trainCM&lt;-confusionMatrix(trainpred,training$classe)
+trainCM</code></pre>
 <pre><code>## Confusion Matrix and Statistics
 ## 
 ##           Reference
@@ -163,40 +164,43 @@ modFit &lt;- train(classe ~ ., method=&quot;gbm&quot;,data=training,verbose=FALS
 ## Detection Rate         0.2804   0.1840   0.1669   0.1575   0.1791
 ## Detection Prevalence   0.2863   0.1934   0.1774   0.1623   0.1807
 ## Balanced Accuracy      0.9890   0.9696   0.9720   0.9777   0.9861</code></pre>
+<p>The In Sample Error is <span class="math">\(1-Training Accuracy\)</span> therefore in the above model it is 0.0320992.</p>
 <p>Here is the model fit against the test/quiz data.</p>
 <pre class="r"><code>testpred&lt;-predict(modFit,newdata=testing)
-confusionMatrix(testpred,testing$classe)</code></pre>
+testCM&lt;-confusionMatrix(testpred,testing$classe)
+trainCM</code></pre>
 <pre><code>## Confusion Matrix and Statistics
 ## 
 ##           Reference
 ## Prediction    A    B    C    D    E
-##          A 2203   31    0    1    4
-##          B   12 1454   36    4   10
-##          C    9   28 1314   44   15
-##          D    8    5   16 1229   16
-##          E    0    0    2    8 1397
+##          A 3302   59    0    1    9
+##          B   30 2167   59    4   17
+##          C   10   46 1965   59    9
+##          D    5    5   25 1855   21
+##          E    1    2    5   11 2109
 ## 
 ## Overall Statistics
 ##                                          
-##                Accuracy : 0.9683         
-##                  95% CI : (0.9641, 0.972)
-##     No Information Rate : 0.2845         
+##                Accuracy : 0.9679         
+##                  95% CI : (0.9646, 0.971)
+##     No Information Rate : 0.2843         
 ##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16      
 ##                                          
-##                   Kappa : 0.9599         
-##  Mcnemar's Test P-Value : 7.42e-10       
+##                   Kappa : 0.9594         
+##  Mcnemar's Test P-Value : 3.457e-09      
 ## 
 ## Statistics by Class:
 ## 
 ##                      Class: A Class: B Class: C Class: D Class: E
-## Sensitivity            0.9870   0.9578   0.9605   0.9557   0.9688
-## Specificity            0.9936   0.9902   0.9852   0.9931   0.9984
-## Pos Pred Value         0.9839   0.9591   0.9319   0.9647   0.9929
-## Neg Pred Value         0.9948   0.9899   0.9916   0.9913   0.9930
-## Prevalence             0.2845   0.1935   0.1744   0.1639   0.1838
-## Detection Rate         0.2808   0.1853   0.1675   0.1566   0.1781
-## Detection Prevalence   0.2854   0.1932   0.1797   0.1624   0.1793
-## Balanced Accuracy      0.9903   0.9740   0.9729   0.9744   0.9836</code></pre>
+## Sensitivity            0.9863   0.9509   0.9567   0.9611   0.9741
+## Specificity            0.9918   0.9884   0.9872   0.9943   0.9980
+## Pos Pred Value         0.9795   0.9517   0.9406   0.9707   0.9911
+## Neg Pred Value         0.9945   0.9882   0.9908   0.9924   0.9942
+## Prevalence             0.2843   0.1935   0.1744   0.1639   0.1838
+## Detection Rate         0.2804   0.1840   0.1669   0.1575   0.1791
+## Detection Prevalence   0.2863   0.1934   0.1774   0.1623   0.1807
+## Balanced Accuracy      0.9890   0.9696   0.9720   0.9777   0.9861</code></pre>
+<p>The Out of Sample Error is <span class="math">\(1-Testing Accuracy\)</span> therefore in the above model it is 0.0317359.</p>
 <p>The results of this model’s predictions against the actual test data (pml-testing.csv) gave 20 out of 20 correct predictions.</p>
 </div>
 <div id="references" class="section level2">
