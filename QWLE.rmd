@@ -64,15 +64,21 @@ Here is the model fit against the training data.
 
 ```{r}
 trainpred<-predict(modFit,newdata=training)
-confusionMatrix(trainpred,training$classe)
+trainCM<-confusionMatrix(trainpred,training$classe)
+trainCM
 ```
+
+The In Sample Error is $1-Training Accuracy$ therefore in the above model it is `r 1-trainCM$overall["Accuracy"]`.
 
 Here is the model fit against the test/quiz data.
 
 ```{r}
 testpred<-predict(modFit,newdata=testing)
-confusionMatrix(testpred,testing$classe)
+testCM<-confusionMatrix(testpred,testing$classe)
+trainCM
 ```
+
+The Out of Sample Error is $1-Testing Accuracy$ therefore in the above model it is `r 1-testCM$overall["Accuracy"]`.
 
 The results of this model's predictions against the actual test data (pml-testing.csv) gave 20 out of 20 correct predictions.
 
