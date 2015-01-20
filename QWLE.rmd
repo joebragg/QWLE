@@ -1,0 +1,83 @@
+---
+title: "Quality of Weight Lifting Exercises"
+author: "Joe Bragg"
+date: "Monday, January 12, 2015"
+output: html_document
+---
+##Executive Summary
+This is an analysis of the [Human Activity Recognition Weight Lifting Exercises Dataset](http://groupware.les.inf.puc-rio.br/har#weight_lifting_exercises) which classifies Unilateral Dumbbell Biceps Curls performed by 6 participants as correctly performed (Class A), throwing the elbows to the front (Class B), lifting the dumbbell only halfway (Class C), lowering the dumbbell only halfway (Class D) and throwing the hips to the front (Class E). The below machine learning analysis attempts to predict these classifications based on measurements from sensors on the belt, arm and the weight itself.
+
+The data includes a training data set (pml-training.csv) and a testing data set (pml-testing.csv).
+
+This analysis concluded that Stochastic Gradient Boosting (gbm) provided the greatest Accuracy of predictions against the observed results.
+
+##Analysis
+
+We begin the analysis by downloading (if needed) and loading the "pml-testing.csv" into a data frame named "origdata".
+
+```{r}
+if(!file.exists("pml-training.csv")){
+        download.file("http://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv",destfile="pml-training.csv")
+}
+origdata<-read.csv("pml-training.csv")
+dim(origdata)
+```
+
+This data frame is quite large with `r nrow(origdata)` rows and `r ncol(origdata)` columns.
+
+The data is actually a combination of raw sensor data and statistical summary data at the end of each sliding window. The raw data includes axial fields for roll, pitch & yaw, as well as gyro, acceleration and magnetic data. The summary data includes mean, variance, standard deviation, max, min, amplitude, kurtosis and skewness of the sensor data in the sliding windows.
+
+The summary data includes numerous NAs as they are only calculated at the end of the sliding windows and they include divide by 0 entries. Taking a peek at the "pml-testing.csv" data none of the entries include summary data nor do they seem to be split by time series. For these reasons, the summary data will not be used in this analysis.
+
+Here we remove those summary variables and include only the raw sensor data and the observed "classe" field. This results in a data table with 19,622 rows and 49 variables.
+
+```{r}
+sensordata<-origdata[,c(160,grep("^roll|^pitch|^yaw|^gyros|^accel|^magnet",
+                names(origdata)))]
+```
+
+We will now split the sensor data into a training and test/quiz set.
+
+```{r}
+library(caret)
+inTrain <- createDataPartition(y=sensordata$classe,p=0.6, list=FALSE)
+training <- sensordata[inTrain,]
+testing <- sensordata[-inTrain,]
+```
+
+We checked to determine if there is any opportunity to further reduce the number variables. We checked for Near Zero Variation variables but none existed. Below is a heat map of the variable correlations but it seems only a few have any significant correlation (>0.8).
+
+```{r}
+library(corrplot)
+trainCor <- cor(training[,-1])
+corrplot(trainCor, method = "shade")
+```
+
+After testing a few random tree models with and without preprocessing, it seems Stochastic Gradient Boosting (gbm) provided the greatest Accuracy against the observed "classe" field in the training data (0.9739) and in the cross validation test/quiz data (0.9592).
+
+```{r cache=TRUE}
+set.seed(1234)
+modFit <- train(classe ~ ., method="gbm",data=training,verbose=FALSE)
+```
+
+Here is the model fit against the training data.
+
+```{r}
+trainpred<-predict(modFit,newdata=training)
+confusionMatrix(trainpred,training$classe)
+```
+
+Here is the model fit against the test/quiz data.
+
+```{r}
+testpred<-predict(modFit,newdata=testing)
+confusionMatrix(testpred,testing$classe)
+```
+
+The results of this model's predictions against the actual test data (pml-testing.csv) gave 20 out of 20 correct predictions.
+
+##References
+
+Velloso, E.; Bulling, A.; Gellersen, H.; Ugulino, W.; Fuks, H. [Qualitative Activity Recognition of Weight Lifting Exercises](http://groupware.les.inf.puc-rio.br/work.jsf?p1=11201). Proceedings of 4th International Conference in Cooperation with SIGCHI (Augmented Human '13) . Stuttgart, Germany: ACM SIGCHI, 2013.
+
+Read more: http://groupware.les.inf.puc-rio.br/har#wle_paper_section#ixzz3PEJce7CT
