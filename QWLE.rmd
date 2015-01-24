@@ -29,11 +29,21 @@ The data is actually a combination of raw sensor data and statistical summary da
 
 The summary data includes numerous NAs as they are only calculated at the end of the sliding windows and they include divide by 0 entries. Taking a peek at the "pml-testing.csv" data none of the entries include summary data nor do they seem to be split by time series. For these reasons, the summary data will not be used in this analysis.
 
+In the raw data, only the predictor variables that begin with roll, pitch, yaw, gyros and accel are relevant measurements to predict activity quality from the activity monitors. Therefore, all other variables including user names, time stamps and window information will be ignored.
+
 Here we remove those summary variables and include only the raw sensor data and the observed "classe" field. This results in a data table with 19,622 rows and 49 variables.
 
 ```{r}
 sensordata<-origdata[,c(160,grep("^roll|^pitch|^yaw|^gyros|^accel|^magnet",
                 names(origdata)))]
+```
+
+We checked to determine if there is any opportunity to further reduce the number variables. We checked for Near Zero Variation of the variables but none existed. Below is a heat map of the variable correlations but it seems only a few have any significant correlation (>0.8) off the diagonal.
+
+```{r fig.width=8,fig.height=8}
+library(corrplot)
+trainCor <- cor(sensordata[,-1])
+corrplot(trainCor, method = "shade")
 ```
 
 We will now split the sensor data into a training and test/quiz set.
@@ -45,40 +55,32 @@ training <- sensordata[inTrain,]
 testing <- sensordata[-inTrain,]
 ```
 
-We checked to determine if there is any opportunity to further reduce the number variables. We checked for Near Zero Variation variables but none existed. Below is a heat map of the variable correlations but it seems only a few have any significant correlation (>0.8).
-
-```{r}
-library(corrplot)
-trainCor <- cor(training[,-1])
-corrplot(trainCor, method = "shade")
-```
-
-After testing a few random tree models with and without preprocessing, it seems Stochastic Gradient Boosting (gbm) provided the greatest Accuracy against the observed "classe" field in the training data (0.9739) and in the cross validation test/quiz data (0.9592).
+After testing a few random tree models with and without preprocessing, it seems Stochastic Gradient Boosting (gbm) provided the greatest Accuracy against the observed "classe" field in the training data and in the cross validation test/quiz data. (Note: Messages are suppressed to inhibit lists of packages loading and other extraneous information.)
 
 ```{r cache=TRUE}
 set.seed(1234)
-modFit <- train(classe ~ ., method="gbm",data=training,verbose=FALSE)
+modFit <- suppressMessages(train(classe ~ ., method="gbm",data=training,verbose=FALSE))
 ```
 
-Here is the model fit against the training data.
+Here is the model fit against the training data and the resulting Accuracy.
 
 ```{r}
-trainpred<-predict(modFit,newdata=training)
+trainpred<-suppressMessages(predict(modFit,newdata=training))
 trainCM<-confusionMatrix(trainpred,training$classe)
-trainCM
+trainCM$overall["Accuracy"]
 ```
 
-The In Sample Error is $1-Training Accuracy$ therefore in the above model it is `r 1-trainCM$overall["Accuracy"]`.
+The In Sample Error is 1-Overall Training Accuracy, therefore in the above model it is `r round(1-trainCM$overall["Accuracy"],digits=4)`.
 
-Here is the model fit against the test/quiz data.
+Here is the model fit against the test/quiz data and the resulting Accuracy.
 
 ```{r}
 testpred<-predict(modFit,newdata=testing)
 testCM<-confusionMatrix(testpred,testing$classe)
-trainCM
+testCM$overall["Accuracy"]
 ```
 
-The Out of Sample Error is $1-Testing Accuracy$ therefore in the above model it is `r 1-testCM$overall["Accuracy"]`.
+The Out of Sample Error is 1-Overall Testing Accuracy, therefore in the above model it is `r round(1-testCM$overall["Accuracy"],digits=4)` which is greater than the In Sample Error above so we don't seem to be over fitting.
 
 The results of this model's predictions against the actual test data (pml-testing.csv) gave 20 out of 20 correct predictions.
 
