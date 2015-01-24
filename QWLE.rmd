@@ -62,7 +62,7 @@ set.seed(1234)
 modFit <- suppressMessages(train(classe ~ ., method="gbm",data=training,verbose=FALSE))
 ```
 
-Here is the model fit against the training data and the resulting Accuracy. See Appedix for details.
+Here is the model fit against the training data and the resulting Accuracy. See Appendix for details.
 
 ```{r}
 trainpred<-suppressMessages(predict(modFit,newdata=training))
@@ -72,7 +72,7 @@ trainCM$overall["Accuracy"]
 
 The In Sample Error is 1-Overall Training Accuracy, therefore in the above model it is `r round(1-trainCM$overall["Accuracy"],digits=4)`.
 
-Here is the model fit against the test/quiz data and the resulting Accuracy. See Appedix for details.
+Here is the model fit against the test/quiz data and the resulting Accuracy. See Appendix for details.
 
 ```{r}
 testpred<-predict(modFit,newdata=testing)
@@ -91,7 +91,7 @@ Velloso, E.; Bulling, A.; Gellersen, H.; Ugulino, W.; Fuks, H. [Qualitative Acti
 Read more: http://groupware.les.inf.puc-rio.br/har#wle_paper_section#ixzz3PEJce7CT
 
 ##Appendix
-Below are the details of the final training and testing Confusion Matrixes.
+Below are the details of the final training and testing Confusion Matrices.
 
 ```{r}
 trainCM
