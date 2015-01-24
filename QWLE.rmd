@@ -62,7 +62,7 @@ set.seed(1234)
 modFit <- suppressMessages(train(classe ~ ., method="gbm",data=training,verbose=FALSE))
 ```
 
-Here is the model fit against the training data and the resulting Accuracy.
+Here is the model fit against the training data and the resulting Accuracy. See Appedix for details.
 
 ```{r}
 trainpred<-suppressMessages(predict(modFit,newdata=training))
@@ -72,7 +72,7 @@ trainCM$overall["Accuracy"]
 
 The In Sample Error is 1-Overall Training Accuracy, therefore in the above model it is `r round(1-trainCM$overall["Accuracy"],digits=4)`.
 
-Here is the model fit against the test/quiz data and the resulting Accuracy.
+Here is the model fit against the test/quiz data and the resulting Accuracy. See Appedix for details.
 
 ```{r}
 testpred<-predict(modFit,newdata=testing)
@@ -89,3 +89,15 @@ The results of this model's predictions against the actual test data (pml-testin
 Velloso, E.; Bulling, A.; Gellersen, H.; Ugulino, W.; Fuks, H. [Qualitative Activity Recognition of Weight Lifting Exercises](http://groupware.les.inf.puc-rio.br/work.jsf?p1=11201). Proceedings of 4th International Conference in Cooperation with SIGCHI (Augmented Human '13) . Stuttgart, Germany: ACM SIGCHI, 2013.
 
 Read more: http://groupware.les.inf.puc-rio.br/har#wle_paper_section#ixzz3PEJce7CT
+
+##Appendix
+Below are the details of the final training and testing Confusion Matrixes.
+
+```{r}
+trainCM
+```
+
+```{r}
+testCM
+```
+
