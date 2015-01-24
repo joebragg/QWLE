@@ -104,14 +104,14 @@ testing &lt;- sensordata[-inTrain,]</code></pre>
 <p>After testing a few random tree models with and without preprocessing, it seems Stochastic Gradient Boosting (gbm) provided the greatest Accuracy against the observed “classe” field in the training data and in the cross validation test/quiz data. (Note: Messages are suppressed to inhibit lists of packages loading and other extraneous information.)</p>
 <pre class="r"><code>set.seed(1234)
 modFit &lt;- suppressMessages(train(classe ~ ., method=&quot;gbm&quot;,data=training,verbose=FALSE))</code></pre>
-<p>Here is the model fit against the training data and the resulting Accuracy.</p>
+<p>Here is the model fit against the training data and the resulting Accuracy. See Appendix for details.</p>
 <pre class="r"><code>trainpred&lt;-suppressMessages(predict(modFit,newdata=training))
 trainCM&lt;-confusionMatrix(trainpred,training$classe)
 trainCM$overall[&quot;Accuracy&quot;]</code></pre>
 <pre><code>##  Accuracy 
 ## 0.9742697</code></pre>
 <p>The In Sample Error is 1-Overall Training Accuracy, therefore in the above model it is 0.0257.</p>
-<p>Here is the model fit against the test/quiz data and the resulting Accuracy.</p>
+<p>Here is the model fit against the test/quiz data and the resulting Accuracy. See Appendix for details.</p>
 <pre class="r"><code>testpred&lt;-predict(modFit,newdata=testing)
 testCM&lt;-confusionMatrix(testpred,testing$classe)
 testCM$overall[&quot;Accuracy&quot;]</code></pre>
@@ -124,6 +124,74 @@ testCM$overall[&quot;Accuracy&quot;]</code></pre>
 <h2>References</h2>
 <p>Velloso, E.; Bulling, A.; Gellersen, H.; Ugulino, W.; Fuks, H. <a href="http://groupware.les.inf.puc-rio.br/work.jsf?p1=11201">Qualitative Activity Recognition of Weight Lifting Exercises</a>. Proceedings of 4th International Conference in Cooperation with SIGCHI (Augmented Human ’13) . Stuttgart, Germany: ACM SIGCHI, 2013.</p>
 <p>Read more: <a href="http://groupware.les.inf.puc-rio.br/har#wle_paper_section#ixzz3PEJce7CT">http://groupware.les.inf.puc-rio.br/har#wle_paper_section#ixzz3PEJce7CT</a></p>
+</div>
+<div id="appendix" class="section level2">
+<h2>Appendix</h2>
+<p>Below are the details of the final training and testing Confusion Matrices.</p>
+<pre class="r"><code>trainCM</code></pre>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction    A    B    C    D    E
+##          A 3316   58    0    0    2
+##          B   22 2182   40   10    8
+##          C    8   39 1994   49   14
+##          D    2    0   16 1861   21
+##          E    0    0    4   10 2120
+## 
+## Overall Statistics
+##                                           
+##                Accuracy : 0.9743          
+##                  95% CI : (0.9712, 0.9771)
+##     No Information Rate : 0.2843          
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
+##                                           
+##                   Kappa : 0.9674          
+##  Mcnemar's Test P-Value : 1.505e-11       
+## 
+## Statistics by Class:
+## 
+##                      Class: A Class: B Class: C Class: D Class: E
+## Sensitivity            0.9904   0.9574   0.9708   0.9642   0.9792
+## Specificity            0.9929   0.9916   0.9887   0.9960   0.9985
+## Pos Pred Value         0.9822   0.9646   0.9477   0.9795   0.9934
+## Neg Pred Value         0.9962   0.9898   0.9938   0.9930   0.9953
+## Prevalence             0.2843   0.1935   0.1744   0.1639   0.1838
+## Detection Rate         0.2816   0.1853   0.1693   0.1580   0.1800
+## Detection Prevalence   0.2867   0.1921   0.1787   0.1613   0.1812
+## Balanced Accuracy      0.9917   0.9745   0.9797   0.9801   0.9889</code></pre>
+<pre class="r"><code>testCM</code></pre>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction    A    B    C    D    E
+##          A 2186   62    0    0    1
+##          B   29 1412   40    4   11
+##          C   13   43 1310   41    9
+##          D    2    1   16 1224   22
+##          E    2    0    2   17 1399
+## 
+## Overall Statistics
+##                                           
+##                Accuracy : 0.9599          
+##                  95% CI : (0.9553, 0.9641)
+##     No Information Rate : 0.2845          
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
+##                                           
+##                   Kappa : 0.9492          
+##  Mcnemar's Test P-Value : 1.828e-08       
+## 
+## Statistics by Class:
+## 
+##                      Class: A Class: B Class: C Class: D Class: E
+## Sensitivity            0.9794   0.9302   0.9576   0.9518   0.9702
+## Specificity            0.9888   0.9867   0.9836   0.9938   0.9967
+## Pos Pred Value         0.9720   0.9439   0.9251   0.9676   0.9852
+## Neg Pred Value         0.9918   0.9833   0.9910   0.9906   0.9933
+## Prevalence             0.2845   0.1935   0.1744   0.1639   0.1838
+## Detection Rate         0.2786   0.1800   0.1670   0.1560   0.1783
+## Detection Prevalence   0.2866   0.1907   0.1805   0.1612   0.1810
+## Balanced Accuracy      0.9841   0.9584   0.9706   0.9728   0.9835</code></pre>
 </div>
 
 
